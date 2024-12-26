@@ -16,17 +16,17 @@ local function get_element_index(tbl, element)
     return 0
 end
 
-local function get_file_full_path_recursive(dir, pattern)
+local function get_filepath_recursive(dir, pattern)
     local files = {}
     -- Get all files in the current directory
-    for _, file in ipairs(vim.fn.glob(dir .. "/" .. pattern, true, true)) do
+    for _, file in ipairs(vim.fn.glob(dir .. "/*." .. pattern, true, true)) do
         table.insert(files, file)
     end
     -- Get all subdirectories
     for _, subdir in ipairs(vim.fn.glob(dir .. "/*", true, true)) do
         if vim.fn.isdirectory(subdir) == 1 then
             -- Recursively get files from subdirectories
-            for _, file in ipairs(get_file_full_path_recursive(subdir, pattern)) do
+            for _, file in ipairs(get_filepath_recursive(subdir, pattern)) do
                 table.insert(files, file)
             end
         end
@@ -34,121 +34,52 @@ local function get_file_full_path_recursive(dir, pattern)
     return files
 end
 
--- local rookie_clangd_default_config = {
---     preset = {
---         {
---             name = "ti c2000",
---             project_dirs = {
---                 "d:/user_chc/3_prj/3_gitlab/product/dht_punch/dht_punch_app/dht_punch",
---             },
---             search_excludes = { ".git", "build", ".cache", ".github", ".gitlab" },
---             search_extension = { "h" },
---             compiler = "gcc",
---             include = {
---                 "d:/user_chc/4_app/ccs/2_ws/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.lts/include",
---             },
---             define = {},
---             extra_flags = {},
---             hooks = {
---                 before_gen = function() end,
---                 after_gen = function() end,
---             },
---         },
---     },
---     also_include_header_parents = true,
---     global_search_excludes = { ".git", "build", ".cache", ".github", ".gitlab" },
---     global_search_extension = { "h" },
---     global_hooks = {
---         before_gen = function() end,
---         after_gen = function() end,
---     },
--- }
---
--- vim.g.rookie_clangd_define_symbols = {}
--- local rookie_clangd_config = rookie_clangd_default_config
---
--- local function rookie_clangd_get_preset_index(presets, dir)
---     if presets == nil or dir == nil then
---         return 0
---     end
---     for i, preset in ipairs(presets) do
---         if preset.project_dirs == nil then
---             for _, value in ipairs(preset.project_dirs) do
---                 if value == dir then
---                     return i
---                 end
---             end
---         end
---     end
---     return 0
--- end
---
--- local function rookie_clangd_search_dir_preset(config, root_path, idx)
---     local excludes = {}
---     if config.preset[idx].search_excludes ~= {} then
---         excludes = config.preset[idx].search_excludes
---     else
---         excludes = config.global_search_excludes
---     end
---
---     local ext = {}
---     if config.preset[idx].search_extension ~= {} then
---         ext = config.preset[idx].search_extension
---     else
---         ext = config.global_search_extension
---     end
---
---     local directories = util_get_dirs_with_extension(root_path, excludes, ext)
---     return directories
--- end
---
--- local function rookie_clangd_search_dir_general(config, root_path)
---     local excludes = config.global_search_excludes
---     local ext = config.global_search_extension
---     local directories = util_get_dirs_with_extension(root_path, excludes, ext)
---     return directories
--- end
---
--- local function rookie_clangd_write_compile_commands()
---     -- Open the file for writing
---     local file = io.open("compile_commands.json", "w")
---     if not file then
---         print("rookie_clangd: Could not open compile_flags.txt for writing.")
---         return
---     end
--- end
---
--- local function rookie_clangd_generate_compile_commands(config)
---     -- Get the current working directory
---     local current_dir = vim.fn.getcwd()
---     local preset_idx = rookie_clangd_get_preset_index(config.preset, current_dir)
---     local include_directories = {}
---     local define_symbol = vim.g.rookie_clangd_define_symbols
---
---     if preset_idx == 0 then
---         include_directories = rookie_clangd_search_dir_general(config, current_dir)
---     else
---         include_directories = rookie_clangd_search_dir_preset(config, current_dir, preset_idx)
---     end
---
---     rookie_clangd_write_compile_commands()
---
---     -- function util_is_element_exist(tbl, element)
---     --     for _, value in ipairs(tbl) do
---     --         if value == element then
---     --             return true -- Element found
---     --         end
---     --     end
---     --     return false -- Element not found
---     -- end
--- end
---
--- function Rookie_clangd_main()
---     rookie_clangd_generate_compile_commands(rookie_clangd_config)
--- end
+local function get_extension(path)
+    return vim.fn.fnamemodify(path, ":e")
+end
+
+local function get_folder(path)
+    return vim.fn.fnamemodify(path, ":p:h")
+end
+
+local function get_container_dirs(root_path, exclude_dirs, extension)
+    local directories = {}
+    local function scan_dir(dir)
+        for file_or_dir in vim.fs.dir(dir) do
+            local full_path = vim.fs.joinpath(dir, file_or_dir)
+            local stat = vim.loop.fs_stat(full_path) -- Get file_or_dir stats
+            if stat and stat.type ~= "directory" then -- Check if it's a directory
+                local ext = get_extension(file_or_dir)
+                local folder = get_folder(full_path)
+                if
+                    ext == extension
+                    and is_in_table(exclude_dirs, folder) == false
+                    and is_in_table(directories, folder) == false
+                then
+                    -- Also insert the parent folder
+                    local parent = folder
+                    while parent ~= root_path do
+                        parent = vim.fn.fnamemodify(parent, ":h")
+                        if is_in_table(directories, parent) == false and parent ~= root_path then
+                            table.insert(directories, parent)
+                        end
+                    end
+                    -- print(folder)
+                    table.insert(directories, folder)
+                    scan_dir(full_path) -- Recursively scan subdirectories
+                end
+            else
+                scan_dir(full_path) -- Recursively scan subdirectories
+            end
+        end
+    end
+    scan_dir(root_path)
+    return directories -- Ensure this returns a table
+end
 
 return {
-  is_in_table = is_in_table,
-  get_element_index = get_element_index,
-  get_file_full_path_recursive = get_file_full_path_recursive,
+    get_container_dirs = get_container_dirs,
+    get_element_index = get_element_index,
+    get_filepath_recursive = get_filepath_recursive,
+    is_in_table = is_in_table,
 }
