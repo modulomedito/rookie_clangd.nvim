@@ -22,9 +22,22 @@ simple but it works.
         {
             "modulo-medito/rookie_clangd.nvim",
             config = function()
+
+                -- Config the user shorter command
+                vim.api.nvim_create_user_command("Xgec", function()
+                    require("rookie_clangd").api.generate_compile_commands()
+                end, {})
+                vim.api.nvim_create_user_command("Xads", function()
+                    require("rookie_clangd").api.add_define_symbol()
+                end, {})
+                vim.api.nvim_create_user_command("Xrms", function()
+                    require("rookie_clangd").api.remove_define_symbol()
+                end, {})
+
+                -- You configuration here
                 require("rookie_clangd").setup({
-                    -- You configuration here
                 })
+
             end,
         },
         -- ... your other lazy plugins

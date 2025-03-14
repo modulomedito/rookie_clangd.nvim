@@ -60,6 +60,7 @@ local function add_define_symbol()
     local current_word = vim.fn.expand("<cword>") -- Get the word under the cursor
     if utils.is_in_table(vim.g.rookie_clangd_define_symbols, current_word) == false then
         table.insert(vim.g.rookie_clangd_define_symbols, current_word)
+        generate_compile_commands() -- Regenerate the "compile_commands.json"
     end
 end
 
@@ -68,6 +69,7 @@ local function remove_define_symbol()
     if utils.is_in_table(vim.g.rookie_clangd_define_symbols, current_word) == true then
         local index = utils.get_element_index(vim.g.rookie_clangd_define_symbols, current_word)
         table.remove(vim.g.rookie_clangd_define_symbols, index)
+        generate_compile_commands() -- Regenerate the "compile_commands.json"
     end
 end
 
