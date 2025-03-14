@@ -9,7 +9,7 @@ local function set_active_preset_index(i)
 end
 
 local function get_related_preset_index(working_dir)
-    local presets = vim.g.rookie_clangd_config.preset
+    local presets = Rookie_clangd_config.preset
     if presets == {} then
         return {}
     end
@@ -32,12 +32,12 @@ local function get_active_preset(working_dir)
     -- Search the active one
     for _, v in ipairs(related_preset_index) do
         if v == property.active_preset_index then
-            return vim.g.rookie_clangd_config.preset[v]
+            return Rookie_clangd_config.preset[v]
         end
     end
     -- The active not found, use the first
     set_active_preset_index(related_preset_index[1])
-    return vim.g.rookie_clangd_config.preset[property.active_preset_index]
+    return Rookie_clangd_config.preset[property.active_preset_index]
 end
 
 local function load_extra_flags(working_dir)
@@ -45,7 +45,7 @@ local function load_extra_flags(working_dir)
     if preset and preset.extra_flags then
         return preset.extra_flags
     else
-        return vim.g.rookie_clangd_config.extra_flags
+        return Rookie_clangd_config.extra_flags
     end
 end
 
@@ -54,7 +54,7 @@ local function load_exclude_dir(working_dir)
     if preset and preset.exclude_dir then
         return preset.exclude_dir
     else
-        return vim.g.rookie_clangd_config.exclude_dir
+        return Rookie_clangd_config.exclude_dir
     end
 end
 
@@ -63,7 +63,7 @@ local function load_compiler(working_dir)
     if preset and preset.compiler then
         return preset.compiler
     else
-        return vim.g.rookie_clangd_config.compiler
+        return Rookie_clangd_config.compiler
     end
 end
 
@@ -72,7 +72,7 @@ local function load_source_pattern(working_dir)
     if preset and preset.source_pattern then
         return preset.source_pattern
     else
-        return vim.g.rookie_clangd_config.source_pattern
+        return Rookie_clangd_config.source_pattern
     end
 end
 
@@ -81,7 +81,7 @@ local function load_header_pattern(working_dir)
     if preset and preset.header_pattern then
         return preset.header_pattern
     else
-        return vim.g.rookie_clangd_config.header_pattern
+        return Rookie_clangd_config.header_pattern
     end
 end
 
@@ -90,7 +90,7 @@ local function load_define(working_dir)
     if preset and preset.define then
         return preset.define
     else
-        return vim.g.rookie_clangd_config.define
+        return Rookie_clangd_config.define
     end
 end
 
@@ -99,7 +99,7 @@ local function load_include(working_dir)
     if preset and preset.include then
         return preset.include
     else
-        return vim.g.rookie_clangd_config.include
+        return Rookie_clangd_config.include
     end
 end
 
@@ -108,7 +108,7 @@ local function load_hooks(working_dir)
     if preset and preset.hooks then
         return preset.hooks
     else
-        return vim.g.rookie_clangd_config.hooks
+        return Rookie_clangd_config.hooks
     end
 end
 

@@ -13,9 +13,6 @@ vim.g.rookie_clangd_is_loaded = 1
 -- Setup
 require("rookie_clangd").setup()
 
--- Global variables
-vim.g.rookie_clangd_define_symbols = {}
-
 -- User commands
 local api = require("rookie_clangd.api")
 vim.api.nvim_create_user_command("RookieClangdGenerateCompileCommands", function()

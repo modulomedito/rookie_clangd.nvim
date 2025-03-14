@@ -77,9 +77,30 @@ local function get_container_dirs(root_path, exclude_dirs, extension)
     return directories -- Ensure this returns a table
 end
 
+local function print_table(tbl)
+    print("Table printing: ")
+    for _, value in ipairs(tbl) do
+        print(value)
+    end
+end
+
+local function deep_copy(original)
+  local copy = {}
+  for k, v in pairs(original) do
+    if type(v) == "table" then
+      copy[k] = deep_copy(v)
+    else
+      copy[k] = v
+    end
+  end
+  return copy
+end
+
 return {
     get_container_dirs = get_container_dirs,
     get_element_index = get_element_index,
     get_filepath_recursive = get_filepath_recursive,
     is_in_table = is_in_table,
+    print_table = print_table,
+    deep_copy = deep_copy,
 }

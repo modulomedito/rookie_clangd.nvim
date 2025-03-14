@@ -27,9 +27,10 @@ local function set_sources(sources)
 end
 
 local function set_defines(defines)
-    for _, define in ipairs(defines) do
-        table.insert(property.defines, define)
-    end
+    property.defines = defines
+    -- for _, define in ipairs(defines) do
+    --     table.insert(property.defines, define)
+    -- end
 end
 
 local function set_includes(includes)

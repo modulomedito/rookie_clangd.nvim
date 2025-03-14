@@ -32,13 +32,24 @@ local default_config = {
     },
 }
 
-vim.g.rookie_clangd_config = default_config
+local default_param = {
+    build_dir = {},
+    compiler = "gcc",
+    defines = {},
+    extra_flags = { "-ferror-limit=3000" },
+    file = {},
+    includes = {},
+    sources = {},
+}
+
+Rookie_clangd_config = default_config
+Rookie_clangd_param = default_param
 
 local M = {}
 
 M.setup = function(user_config)
-    local previous_config = vim.g.rookie_clangd_config or default_config
-    vim.g.rookie_clangd_config = vim.tbl_deep_extend("force", previous_config, user_config or {})
+    local previous_config = Rookie_clangd_config or default_config
+    Rookie_clangd_config = vim.tbl_deep_extend("force", previous_config, user_config or {})
         or default_config
 end
 
