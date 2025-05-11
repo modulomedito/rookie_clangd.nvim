@@ -1,4 +1,4 @@
-# rookie-clangd.nvim
+# rookie_clangd.nvim
 
 This is for who want to browse the C project with the power of Clangd, but without building it with
 CMake.
